@@ -520,7 +520,7 @@ const Field: FC<{
             writer.unsaved = true;
             onChange(value === "true");
           }}
-          className="flex gap-4"
+          className="flex gap-4 h-full"
         >
           {Object.entries(config.options).map(([val, label]) => (
             <div className="flex items-center space-x-2" key={val}>
