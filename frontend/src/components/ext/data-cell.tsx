@@ -28,6 +28,9 @@ export const DataCell: FC<{
   const render = useState({})[1];
   const cellId = `${modelName}-${columnName}-${rowId}-${colIdx}`;
 
+  const model = models[modelName];
+  console.log(model.config);
+
   const select = (action: string) => {
     if (action === "new-tab") {
       if (type === "hasMany") {
@@ -84,6 +87,9 @@ export const DataCell: FC<{
           >
             {type === "hasMany" ? (
               <>{Array.isArray(value) ? value?.length : "0 items"}</>
+            ) : type === "boolean" &&
+              model.config.columns[columnName]?.options ? (
+              model.config.columns[columnName].options[String(value)]
             ) : (
               value
             )}
