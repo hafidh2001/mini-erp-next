@@ -24,8 +24,8 @@ model User {
   actionlogs          ActionLog[]
   changelogs          ChangeLog[]
   sessions            Session[]
-  role                Role?       @relation(fields: [id_role], references: [id])
   id_role             String?     @db.Uuid
+  role                Role?       @relation(fields: [id_role], references: [id])
 
   @@map("m_user")
 }
@@ -78,6 +78,7 @@ model Role {
   deleted_at DateTime?
   created_by String?   @db.Uuid
   updated_by String?
+  active     Boolean   @default(true)
   user       User[]
 
   @@map("m_role")
