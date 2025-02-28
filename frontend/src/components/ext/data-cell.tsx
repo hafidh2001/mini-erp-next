@@ -23,13 +23,31 @@ export const DataCell: FC<{
   value?: any;
   rowId: string;
   colIdx?: number;
+  rel?: { rel: string; col: string };
 }> = (props) => {
-  const { value, modelName, columnName, rowId, colIdx, type } = props;
+  const { value, modelName, columnName, rowId, colIdx, type, rel } = props;
   const render = useState({})[1];
   const cellId = `${modelName}-${columnName}-${rowId}-${colIdx}`;
 
   const model = models[modelName];
-  console.log(model.config);
+  
+  // Handle relation data if rel is provided
+  let displayValue = value;
+  if (rel) {
+    if (Array.isArray(value)) {
+      // For hasMany relations, try to get the specified column from each related record
+      displayValue = value.map(item => item[rel.col]).join(", ");
+    } else if (value && typeof value === "object") {
+      // For single relations, get the specified column
+      displayValue = value[rel.col];
+    }
+  }
+
+  // Handle boolean values with options
+  const column = model.config.columns[columnName];
+  if (type === "boolean" && column?.options) {
+    displayValue = column.options[String(value)];
+  }
 
   const select = (action: string) => {
     if (action === "new-tab") {
@@ -85,13 +103,10 @@ export const DataCell: FC<{
                 : "hover:border-slate-300 hover:bg-white border-transparent "
             )}
           >
-            {type === "hasMany" ? (
+            {type === "hasMany" && !rel ? (
               <>{Array.isArray(value) ? value?.length : "0 items"}</>
-            ) : type === "boolean" &&
-              model.config.columns[columnName]?.options ? (
-              model.config.columns[columnName].options[String(value)]
             ) : (
-              value
+              displayValue || ""
             )}
           </div>
         </PopoverTrigger>

@@ -8,6 +8,19 @@ import * as Models from "shared/models";
 import { LayoutTable } from "system/model/layout/types";
 import { ModelName } from "shared/types";
 
+interface ColumnMetaData {
+  modelName: ModelName;
+  columnName: string;
+  accessorPath: string;
+  type: string;
+  sortable: boolean;
+  filterable: boolean;
+  rel?: {
+    rel: string;
+    col: string;
+  };
+}
+
 type WhereClause = {
   [key: string]: {
     in?: any[];
@@ -259,19 +272,34 @@ export const useModelTable = ({
             }
           }
 
+          const columnMeta: ColumnMetaData = {
+            accessorPath,
+            modelName: model.name as ModelName,
+            columnName: accessorPath,
+            type: !hasRelation
+              ? (model.instance?.config.columns[fieldName]?.type || "string")
+              : (relatedModels[relatedModels.length - 1]?.type || "string"),
+            sortable: true,
+            filterable: true,
+          };
+
+          // Add relation info for rel columns
+          if ("rel" in column && "col" in column && typeof column.rel === "string") {
+            const modelKey = Object.keys(Models).find(
+              (key) => key.toLowerCase() === column.rel.toLowerCase()
+            );
+            if (modelKey && typeof column.col === "string") {
+              columnMeta.rel = { 
+                rel: column.rel,
+                col: column.col
+              };
+            }
+          }
+
           return {
             accessorKey: accessorPath,
             header: headerText,
-            meta: {
-              accessorPath,
-              modelName: model.name,
-              columnName: accessorPath,
-              type: !hasRelation
-                ? model.instance?.config.columns[fieldName]?.type
-                : relatedModels[relatedModels.length - 1]?.type,
-              sortable: true,
-              filterable: true,
-            },
+            meta: columnMeta,
           };
         });
 

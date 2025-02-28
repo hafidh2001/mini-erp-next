@@ -32,6 +32,10 @@ export type ColumnMetaData = {
   columnName: string;
   accessorPath: string;
   type: string;
+  rel?: {
+    rel: string;
+    col: string;
+  };
 };
 
 export function DataTable({
@@ -184,6 +188,7 @@ export function DataTable({
                             type={meta.type ?? ""}
                             value={value}
                             rowId={row.original[primaryKey]}
+                            rel={meta.rel}
                           />
                         );
                       })()}
@@ -225,19 +230,24 @@ export function DataTable({
 const getNestedValue = (obj: any, path: string[]): any => {
   let current = obj;
   for (const key of path) {
+    if (current === undefined || current === null) {
+      return undefined;
+    }
+    
     if (Array.isArray(current)) {
-      // If current is an array, take first element
+      // Keep array if it's the final value
+      if (path[path.length - 1] === key) {
+        return current;
+      }
+      // Otherwise take first element for navigation
       current = current[0];
     }
+    
     if (current && typeof current === "object" && key in current) {
       current = current[key];
     } else {
       return undefined;
     }
-  }
-  // Handle final value being an array
-  if (Array.isArray(current)) {
-    current = current[0];
   }
   return current;
 };

@@ -505,7 +505,6 @@ const Field: FC<{
   onChange: (value: any) => void;
 }> = ({ model, col, writer, onChange }) => {
   const form = useReader(writer);
-  console.log({ form });
 
   const config = model.config.columns[col];
   const value = form.data[col];
