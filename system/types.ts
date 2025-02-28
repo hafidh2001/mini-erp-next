@@ -20,6 +20,7 @@ export interface ColumnConfig {
   format?: (value: any) => any;
   validate?: (value: any) => boolean | string;
   enum?: string[];
+  options?: Record<string, string>;
   relation?: {
     model: string;
     field: string;
