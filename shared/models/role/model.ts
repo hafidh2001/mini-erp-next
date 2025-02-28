@@ -44,6 +44,15 @@ const columns: Record<string, ColumnConfig> = {
     label: "Name",
     required: true,
   },
+  active: {
+    type: "boolean",
+    label: "Active",
+    required: true,
+    options: {
+      true: "Active",
+      false: "Inactive",
+    },
+  },
 };
 
 /** Relations **/
