@@ -3,6 +3,8 @@ import { SimpleTooltip } from "@/components/ext/simple-tooltip";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/global-alert";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useModelDetail } from "@/hooks/use-model-detail";
 import { useReader, useWriter } from "@/hooks/use-read-write";
@@ -503,9 +505,34 @@ const Field: FC<{
   onChange: (value: any) => void;
 }> = ({ model, col, writer, onChange }) => {
   const form = useReader(writer);
+  console.log({ form });
 
   const config = model.config.columns[col];
   const value = form.data[col];
+  if (config.type === "boolean" && config.options) {
+    return (
+      <div className="field flex-1 flex flex-col gap-1 text-sm">
+        <div className="font-medium">{config.label}</div>
+        <RadioGroup
+          value={String(value)}
+          onValueChange={(value: string) => {
+            writer.data[col] = value === "true";
+            writer.unsaved = true;
+            onChange(value === "true");
+          }}
+          className="flex gap-4"
+        >
+          {Object.entries(config.options).map(([val, label]) => (
+            <div className="flex items-center space-x-2" key={val}>
+              <RadioGroupItem value={val} id={`${col}-${val}`} />
+              <Label htmlFor={`${col}-${val}`}>{label}</Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+    );
+  }
+
   return (
     <label className="field flex-1 flex flex-col gap-1 text-sm">
       <div className="font-medium">{config.label}</div>
